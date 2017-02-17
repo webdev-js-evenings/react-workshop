@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./style.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Style guide</h1>
+      </div>
+    </div>
+      <div class="row">
+        <div class="col-md-8">
+          <h3>API</h3>
+        </div>
+        <div class="col-md-4">
+          <h3>Výsledek</h3>
+        </div>
+      </div>
+      <div class="row api-row">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Button</h4>
+          </div>
+        </div>
+         <div class="col-md-3 api-col">
+           <div class="api-var">
+             <div class="form-group var-template template">
+               <label for="" class=""></label>
+               <input type="text" class="form-control">
+              </div>
+           </div>
+        </div>
+        <div class="col-md-5 code-col">
+          <code class="language-html" data-lang="html">
+            <xmp>
+              <button class="btn {type}">The type of this button is "{type}" and is called {name}</button>
+            </xmp>
+          </code>
+        </div>
+        <div class="col-md-4">
+          <div class="result">
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row api-row">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Large button</h4>
+          </div>
+        </div>
+         <div class="col-md-3 api-col">
+           <div class="api-var">
+             <div class="form-group var-template template">
+               <label for="" class=""></label>
+               <input type="text" class="form-control">
+              </div>
+           </div>
+        </div>
+        <div class="col-md-5 code-col">
+          <code class="language-html" data-lang="html">
+            <xmp>
+              <button class="btn {type} btn-lg">Large button type is "{type}" and is called {name}</button>
+            </xmp>
+          </code>
+        </div>
+        <div class="col-md-4">
+          <div class="result">
+
+          </div>
+        </div>
+      </div>
+
+  </div>
+</body>
+<script>
+function getVars(txt) {
+  var regex = /\{([^}]+)\}/g;
+  var matches;
+  var results = []
+  while (matches = regex.exec(txt)) {
+    results.push(matches)
+  }
+
+  return results.reduce(function(vars, match)  {
+    var varName = match[1]
+    if (!vars[varName]) {
+      vars[varName] = []
+    }
+    vars[varName].push(match['index'])
+    return vars
+  }, {})
+}
+
+function replaceVars(string, variables) {
+    var changes = []
+    Object.keys(variables).forEach(function(replaced) {
+      var position = -1
+      while ((position = string.indexOf(replaced, position + 1)) > -1) {
+        if (!changes.hasOwnProperty(position)) {
+          changes[position] = variables[replaced]
+          if (replaced.length > 1) {
+            args = Array(replaced.length + 1)
+            args[0] = position + 1;
+            args[1] = replaced.length - 1;
+            [].splice.apply(changes, args)
+          }
+        }
+      }
+    })
+
+    var resultArray = string.split('').map(function(letter, index) {
+      if (changes.hasOwnProperty(index)) {
+        return changes[index] || ''
+      }
+
+      return letter
+    })
+
+    return resultArray.join('')
+}
+
+function applyVars(elem) {
+
+  $(elem).closest('.row').each(function() {
+    var vars = {}
+
+    $('.var-template').each(function() {
+      var val = $(this).find('input').val()
+      var varName = $(this).data('varname')
+      if (val) {
+        vars['{'+ varName +'}'] = val
+      }
+    })
+
+    var codeCol = $(this).find('.code-col code xmp.template')
+    var resultCol = $(this).find('.result')
+    var result = replaceVars(codeCol.html(), vars)
+    resultCol.html(result)
+    $(this).find('.code-col code xmp').not('.template').html(result)
+  })
+}
+
+$(function() {
+  // handlovat change na políčkách pro proměnné (fakt náročný)
+  $(document).on('input', '.var-template', function(e) {
+    applyVars(this)
+    // var val = e.target.value
+    // var varName = $(this).data('varname')
+
+    // // console.log('bum', val)
+    // // console.log(codeCol.html().replace('{'+ varName +'}', val))
+    // var vars = {}
+    // vars['{'+ varName +'}'] = val
+    // var result = replaceVars(codeCol.html(), vars)
+    // resultCol.html(result)
+    // $(this).closest('.row').find('.code-col code xmp').not('.template').html(result)
+
+    // ehm ehm
+    //codeCol.html(replaceVars(codeCol.html(), vars))
+
+  })
+
+  $('.code-col code xmp').each(function() {
+    var element = this
+    $(element).parent().append($(element).clone().addClass('template'))
+    $(this).closest('.row').find('.result').html($(this).html())
+
+    var html = $(this).html()
+    // vyparsovat promměné z textu
+    var vars = getVars(html)
+
+    // vytvořit políčka pro proměnné
+    Object.keys(vars).forEach(function(varName) {
+      var cln = $(element).closest('.row').find('.var-template').first().clone()
+      cln.removeClass('template')
+      cln.find('label').text(varName)
+      cln.attr('data-varname', varName)
+      $(element).closest('.row').find('.api-var').append(cln)
+    })
+  })
+
+
+})
+</script>
+</html>

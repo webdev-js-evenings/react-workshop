@@ -1,0 +1,17 @@
+.api-col {
+  border-right: 1px solid #ccc;
+}
+
+.api-row {
+  border-bottom: 1px solid #ccc;
+}
+
+xmp {
+  margin: 0;
+  white-space: normal;
+}
+
+
+.template {
+  display: none;
+}
