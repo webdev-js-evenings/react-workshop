@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./style.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Style guide</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <h3>API</h3>
+      </div>
+      <div class="col-md-4">
+        <h3>Výsledek</h3>
+      </div>
+    </div>
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Button</h4>
+          </div>
+        </div>
+        <div class="row api-row simple-btn-row">
+         <div class="col-md-3 api-col">
+           <div class="api-var">
+<script id="var-template" type="text/x-handlebars-template">
+  {{#each vars}}
+    <div class="form-group">
+      <label for="" class="">{{ name }}</label>
+      <input type="text" class="form-control string-input" name="{{name}}">
+    </div>
+  {{/each}}
+</script>
+              <div class="api-var-content"></div>
+           </div>
+        </div>
+        <div class="col-md-5 code-col">
+          <code class="language-html" data-lang="html">
+<script id="simple-btn-template" type="text/x-handlebars-template" data-props='{"type": "string", "text": "string", "size": "string"}'>
+  <button class="btn {{size}} {{type}}">{{text}}</button>
+</script>
+            <xmp class="code-example">
+
+            </xmp>
+          </code>
+        </div>
+        <div class="col-md-4">
+          <div class="result">
+
+          </div>
+        </div>
+      </div>
+
+<div class="api-row dropdown-btn-row">
+<script id="dropdown-btn-template" type="text/x-handlebars-template">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Dropdown button</h4>
+          </div>
+        </div>
+        <div class="row">
+         <div class="col-md-2 api-col">
+           <div class="api-var">
+             <form id="vars-form">
+             {{#each vars}}
+                <div class="form-group">
+                  <label for="" class="">{{ name }}</label>
+                  <input type="text" class="form-control string-input" name="{{name}}">
+                </div>
+              {{/each}}
+              <button class="btn btn-success">Render</button>
+              </form>
+           </div>
+        </div>
+        <div class="col-md-6 code-col">
+          <code class="language-html" data-lang="html">
+            <xmp class="code-example">
+<div class="btn-group btn-dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {{text}} <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu {{#if dropped}}visible{{else}}hidden{{/if}}">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+    {{#each options}}
+      <li><a href="#">{{text}}</a></li>
+    {{/each}}
+  </ul>
+</div>
+            </xmp>
+          </code>
+        </div>
+        <div class="col-md-4">
+<div class="btn-group btn-dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {{text}} <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu {{#if dropped}}show{{else}}hidden{{/if}}">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+    {{#each options}}
+      <li><a href="#">{{text}}</a></li>
+    {{/each}}
+  </ul>
+</div>
+        </div>
+        </div>
+</script>
+      </div>
+  </div>
+</body>
+<script src="./index.js"></script>
+</html>

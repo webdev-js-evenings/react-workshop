@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="../style.css">
   <title>Document</title>
 </head>
 <body>
@@ -22,173 +22,127 @@
           <h3>Výsledek</h3>
         </div>
       </div>
-      <div class="row api-row">
+      <div class="api-row simple-button-row">
         <div class="row">
           <div class="col-md-12">
             <h4>Button</h4>
           </div>
         </div>
-         <div class="col-md-3 api-col">
+        <div class="row">
+         <div class="col-md-2 api-col">
            <div class="api-var">
-             <div class="form-group var-template template">
-               <label for="" class=""></label>
-               <input type="text" class="form-control">
+             <div class="form-group var-template">
+               <label for="" class="">Text</label>
+               <input type="text" id="simple-button-text" class="form-control">
               </div>
            </div>
+              <div class="form-group var-template">
+                <label for="" class="">Class</label><br>
+                <small>Vyzkoušej <code>btn-success</code></small>
+                <input type="text" id="simple-button-class" class="form-control">
+              </div>
         </div>
-        <div class="col-md-5 code-col">
+        <div class="col-md-6 code-col">
           <code class="language-html" data-lang="html">
-            <xmp>
-              <button class="btn {type}">The type of this button is "{type}" and is called {name}</button>
+            <xmp class="code-example">
+<button class="btn btn-danger text-target">
+  This is default text
+</button>
             </xmp>
           </code>
         </div>
         <div class="col-md-4">
-          <div class="result">
-
+          <div class="simple-button-result">
+            <button class="btn btn-danger text-target">
+  This is default text
+</button>
           </div>
+        </div>
         </div>
       </div>
 
 
-      <div class="row api-row">
+      <div class="api-row dropdown-btn-row">
         <div class="row">
           <div class="col-md-12">
-            <h4>Large button</h4>
+            <h4>Dropdown button</h4>
           </div>
         </div>
-         <div class="col-md-3 api-col">
+        <div class="row">
+         <div class="col-md-2 api-col">
            <div class="api-var">
-             <div class="form-group var-template template">
-               <label for="" class=""></label>
-               <input type="text" class="form-control">
+             <div class="form-group var-template">
+               <label for="" class="">Text</label>
+               <input type="text" id="btn-dropdown-text" class="form-control">
+              </div>
+
+              <div class="form-group var-template">
+               <label for="" class="">Unfold</label>
+               <input type="checkbox" checked id="btn-dropdown-dropping" class="form-control">
+              </div>
+
+             <div class="form-group var-template">
+               <label for="" class="">Add option</label>
+               <input type="text" id="btn-dropdown-option" class="form-control">
               </div>
            </div>
         </div>
-        <div class="col-md-5 code-col">
+        <div class="col-md-6 code-col">
           <code class="language-html" data-lang="html">
-            <xmp>
-              <button class="btn {type} btn-lg">Large button type is "{type}" and is called {name}</button>
+            <xmp class="code-example">
+<div class="btn-group btn-dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Action <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+  </ul>
+</div>
             </xmp>
           </code>
         </div>
         <div class="col-md-4">
-          <div class="result">
+          <!-- Single button -->
+          <div class="btn-dropdown-result">
+          <div class="btn-group btn-dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Action <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+  </ul>
+</div>
+</div>
+        </div>
+        </div>
+      </div>
 
+
+
+<div class="api-row meals">
+        <div class="row">
+          <div class="col-md-12">
+            <h4>Jídla</h4>
           </div>
+        </div>
+        <div class="row">
+         <div class="col-md-12 api-col meals-col">
+            <ul class="meals-menu"></ul>
+
+
+        </div>
         </div>
       </div>
 
   </div>
 </body>
-<script>
-function getVars(txt) {
-  var regex = /\{([^}]+)\}/g;
-  var matches;
-  var results = []
-  while (matches = regex.exec(txt)) {
-    results.push(matches)
-  }
-
-  return results.reduce(function(vars, match)  {
-    var varName = match[1]
-    if (!vars[varName]) {
-      vars[varName] = []
-    }
-    vars[varName].push(match['index'])
-    return vars
-  }, {})
-}
-
-function replaceVars(string, variables) {
-    var changes = []
-    Object.keys(variables).forEach(function(replaced) {
-      var position = -1
-      while ((position = string.indexOf(replaced, position + 1)) > -1) {
-        if (!changes.hasOwnProperty(position)) {
-          changes[position] = variables[replaced]
-          if (replaced.length > 1) {
-            args = Array(replaced.length + 1)
-            args[0] = position + 1;
-            args[1] = replaced.length - 1;
-            [].splice.apply(changes, args)
-          }
-        }
-      }
-    })
-
-    var resultArray = string.split('').map(function(letter, index) {
-      if (changes.hasOwnProperty(index)) {
-        return changes[index] || ''
-      }
-
-      return letter
-    })
-
-    return resultArray.join('')
-}
-
-function applyVars(elem) {
-
-  $(elem).closest('.row').each(function() {
-    var vars = {}
-
-    $('.var-template').each(function() {
-      var val = $(this).find('input').val()
-      var varName = $(this).data('varname')
-      if (val) {
-        vars['{'+ varName +'}'] = val
-      }
-    })
-
-    var codeCol = $(this).find('.code-col code xmp.template')
-    var resultCol = $(this).find('.result')
-    var result = replaceVars(codeCol.html(), vars)
-    resultCol.html(result)
-    $(this).find('.code-col code xmp').not('.template').html(result)
-  })
-}
-
-$(function() {
-  // handlovat change na políčkách pro proměnné (fakt náročný)
-  $(document).on('input', '.var-template', function(e) {
-    applyVars(this)
-    // var val = e.target.value
-    // var varName = $(this).data('varname')
-
-    // // console.log('bum', val)
-    // // console.log(codeCol.html().replace('{'+ varName +'}', val))
-    // var vars = {}
-    // vars['{'+ varName +'}'] = val
-    // var result = replaceVars(codeCol.html(), vars)
-    // resultCol.html(result)
-    // $(this).closest('.row').find('.code-col code xmp').not('.template').html(result)
-
-    // ehm ehm
-    //codeCol.html(replaceVars(codeCol.html(), vars))
-
-  })
-
-  $('.code-col code xmp').each(function() {
-    var element = this
-    $(element).parent().append($(element).clone().addClass('template'))
-    $(this).closest('.row').find('.result').html($(this).html())
-
-    var html = $(this).html()
-    // vyparsovat promměné z textu
-    var vars = getVars(html)
-
-    // vytvořit políčka pro proměnné
-    Object.keys(vars).forEach(function(varName) {
-      var cln = $(element).closest('.row').find('.var-template').first().clone()
-      cln.removeClass('template')
-      cln.find('label').text(varName)
-      cln.attr('data-varname', varName)
-      $(element).closest('.row').find('.api-var').append(cln)
-    })
-  })
-
-
-})
-</script>
+<script src="./index.js"></script>
 </html>
