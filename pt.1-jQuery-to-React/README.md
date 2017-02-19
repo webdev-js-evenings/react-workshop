@@ -4,6 +4,7 @@
 Vítejte na kurzu v rámci naší vývojářské facebookové skupiny [WebDev](https://www.facebook.com/groups/webdevjs/). Materiály, účast a vůbec všechno je zadáčo, akorát nás tak můžete sledovat na naší [fb skupině](https://www.facebook.com/groups/webdevjs/), to bychom byli rádi :).
 
 Tenhle materiál se vztahuje jen k první části kurzu, budou navazovat další, které budou lektořit:
+
 - Petr Brzek [@PetrBrzek](https://twitter.com/petrbrzek) @[Avocode](https://avocode.com/) - React prakticky
 - Jirka Vyhnálek [@JiriVyhnalek](https://twitter.com/JiriVyhnalek) @Microsoft - state management, asynchronní kód
 
@@ -44,7 +45,8 @@ No a jak se to člověk nejlépe naučí? Když si něco naimplementí, jdeme na
 ## Jak budeme přístupy hodnotit
 Psaní UI je programování jako každé jiné, tím narážím na potřebu některých vývojářů nad psáním UI ohrnovat nos a říkat, že by to v Dreavieweru napsali za hodinu. Je to normální prográmko a troufám si říct, že v případě velkých UI je komplikovanější než serverová klasika request-response.
 
-No a protože jsme si tedy ustanovili, že to programování je, zde prosím nabízím podle mě objektivní a velice abstraktní kritérie hodnocení kvality přístupu k implementaci.
+No a protože jsme si tedy ustanovili, že to programování je, zde prosím nabízím podle mě objektivní a velice abstraktní kritérie hodnocení kvality přístupu k implementaci:
+
 1. testovatelnost
 2. jednoduchost (čitelnost, udržovatelnost)
 3. spolehlivost (nerozbitnost)
@@ -167,6 +169,7 @@ Hlavní problém, na který jsem narazil při programování byla nemožnost def
 Další problém byla nemožnost udržet referenci na element ve chvíli, kdy se změní a celá šablona se hned překreslít a nové elementy přibudou do DOMu a staré se smažou. To znamená, že při napsání do inputu z něj mizí focus a text, co jsem do něho napsal. Musí se to obcházet přes submit, ale dá se to vyřešit i lépe, k tomu se dostanu.
 
 Abych se dostal ještě na lepší známku, je tudíž potřeba vymyslet systém, který vyřeší:
+
 1. definovaní API pro šablony - datové typy, kontrola existence, sématické informace v event listenerech
 2. bude mít stejnou syntax jako Javascript, abych mohl použít `typeof`, cykly, rekurzy atd.
 3. kvůli spolehlivosti je potřeba se zcela zbavit závislosti na DOMu
