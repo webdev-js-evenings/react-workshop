@@ -11,6 +11,8 @@ Tuhle část kurzu školí Vojta Tranta [@iVojta](https://twitter.com/iVojta). S
 
 Dneska píše React denně ve firmě [Avocode](https://avocode.com/), kde dělá Javascriptového vývojáře na pozici lead kretén.
 
+Moje znalosti jsem nabil především pozorováním práce [Honzy Kůči](https://twitter.com/jankuca), dík!
+
 ## Co se v této části naučíte
 Tento kurz je určený pro vývojáře, kteří se dlouho dobu (jako já) pachtili s UI, které bylo napsané v jQuery bez jakékoli hluboké myšlenky. A stávalo se jim, že kdykoliv začali psát `$('.selector').each()`, si říkali, že zde není něco v pořádku a že musí existovat nějaká lepší cesta, jak to programovati.
 
