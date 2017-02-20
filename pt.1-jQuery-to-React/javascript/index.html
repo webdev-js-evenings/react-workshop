@@ -15,7 +15,7 @@
 <script>
 !function() {
 function createDOM(document) {
-  return ['div', 'span', 'label', 'input', 'button', 'form'].reduce(function(DOM, tag) {
+  return ['div', 'span', 'label', 'p', 'input', 'button', 'form'].reduce(function(DOM, tag) {
     DOM[tag] = function(attrs, children) {
       var elem = document.createElement(tag)
       elem = Object.assign(elem, attrs)
@@ -41,10 +41,26 @@ function createDOM(document) {
 var DOM = createDOM(document)
 var appElement = document.getElementById('app')
 
-function renderDOM(DOM, elem) {
-  elem.innerHTML = ''
+function renderDOM(DOM, elem, fel) {
+  var focusedElem = document.activeElement
+  console.log('e', fel)
+  var childNode = elem.childNodes[0]
+  if (childNode) {
+    elem.removeChild(childNode)
+  }
+
   elem.appendChild(DOM)
+  focusedElem.focus()
 }
+
+
+function createDispath(initialState, renderFn) {
+  return function(stateUpdate) {
+    var newState = Object.assign({}, initialState, stateUpdate)
+    renderFn(newState, createDispath(newState, renderFn))
+  }
+}
+
 
 var defaultData = {
   vars: [
@@ -54,14 +70,36 @@ var defaultData = {
   ],
 }
 
+var d = null
+function createForm(formFn) {
+  var formElem = null
 
-var formData = {}
-function app(data) {
+  function flush() {
+    formElem = null
+  }
+
+  return function() {
+    if (!formElem) {
+      formElem = formFn.apply(null, Array.prototype.slice.call(arguments).concat([flush]))
+    }
+
+    return formElem
+  }
+}
+
+function form(data, dispatch, flush) {
   function handleSubmit(e) {
     e.preventDefault()
     formData = $(e.target).serializeArray()
     console.log(formData)
+    //flush()
+    dispatch({ submitted: formData })
   }
+
+  function handleInput(e) {
+    dispatch({ input: e.target.value })
+  }
+  console.log('bem')
 
   return DOM.form({
     id: 'vars-form',
@@ -73,6 +111,8 @@ function app(data) {
         DOM.label({}, [varDeff.name]),
         DOM.input(Object.assign({
           className: 'form-control',
+          oninput: handleInput,
+          value: data.input || '',
         }, varDeff))
       ])
     }).concat([
@@ -83,7 +123,22 @@ function app(data) {
   )
 }
 
-renderDOM(app(defaultData), appElement)
+var cachedForm = createForm(form)
+function app(data, dispatch) {
+  return DOM.div({},
+    [
+      DOM.p({}, [data.submitted || '']),
+      cachedForm(data, dispatch)
+    ]
+  )
+}
+
+
+renderDOM(app(defaultData, createDispath(defaultData, function(state, dispatch) {
+  console.log(document.activeElement)
+  renderDOM(app(state, dispatch), appElement, document.activeElement)
+})), appElement)
+
 
 }()
 </script>

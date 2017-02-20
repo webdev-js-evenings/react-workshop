@@ -39,7 +39,7 @@ Dynamické UI na klientovi a použití nějakých klientských šablon se hlavn�
 
 Náš úkol bude v podstatě vytořit tabulku se třemi sloupečky a několika řádkami. V prvním sloupečku bude formulář pro vyplnění nějakých dat do šablony dané UI komponenty.V druhém bude kód. No a ve třetím výstup.
 
-No a jak se to člověk nejlépe naučí? Když si něco naimplementí, jdeme na to. První jQuery špagety tak, jak to dneska frčí ve většina firem Antona Hrabiše, třeba v Mafře... :)))
+No a jak se to člověk nejlépe naučí? Když si něco naimplementí, jdeme na to. První jQuery špagety tak, jak to dneska frčí ve většina firem Antona Hrabiše...
 
 
 ## Jak budeme přístupy hodnotit
@@ -182,3 +182,6 @@ Jednoduše se zbavím závislosti na DOMu tak, že ho budu vytvářet jako by to
 Nějakou chytrou technikou by mělo být možné udržet reference na původní objekty v DOMu i při smazání přes `el.innerHTML = ''`.
 
 Zkusíme to!
+
+
+

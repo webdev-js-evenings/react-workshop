@@ -54,5 +54,5 @@ Bez ESLintu si nedovedu představit vývoj. Jasně, kdo má IDE, tak ho nepotře
   - jsou pomalé
   - ... you name it..
 - proto nejde naimplementovat jednoduše formulář, protože nemám `typeof` na kontrolu typu fieldu
-- nicméně šablony fungují poměrně hezky
+- nicméně šablony fungují poměrně hezky, až na to, že nemají pořádné API
 - výborné je to, že view se dá vydefinovat jako `view = template(data)`
