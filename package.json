@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "express": "^4.14.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "scripts": {
+    "server": "node pt.1-jQuery-to-React/javascript/server.js"
+  }
+}

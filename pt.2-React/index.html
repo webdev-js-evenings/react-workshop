@@ -18,26 +18,32 @@
   <div id="app"></div>
 </body>
 <script type="text/babel" data-presets="es2015,stage-0,react">
-(function() {
-// tady
+(function()  {
+// tady =>
 var DOM = React.DOM
 var div = DOM.div
 // ---
 
-function Button(props) {
+const Button = (props) => {
   return (
-    <button className="btn btn-danger text-target">
+    <button className={`btn ${props.class || 'btn-danger'}`}>
       {props.text || 'This is default text'}
     </button>
   )
 }
+Button.propTypes = {
+  text: React.PropTypes.string,
+  class: React.PropTypes.string,
+}
+
+
 
 var state = {
   components: [Button]
 }
 
 
-function Container(props) {
+const Container = (props) => {
   return (
     <div className="container">
       {props.children}
@@ -45,7 +51,7 @@ function Container(props) {
   )
 }
 
-function Row(props) {
+const Row = (props) => {
   return (
     <div className="row">
       {(props.children || []).map(child => {
@@ -59,31 +65,125 @@ function Row(props) {
   )
 }
 
+const ValueInput = ({ field, value, onInputChange }) => {
+  const handleInputChange = (e) => {
+    if (e.target.type === 'checkbox') {
+      return onInputChange(field.name, e.target.checked)
+    }
 
-function Components(props) {
+    return onInputChange(field.name, e.target.value)
+  }
+
+  return (
+    <input
+      className="form-control"
+      id={field.id}
+      type={field.type}
+      defaultChecked={Boolean(value)}
+      defaultValue={value || ''}
+      onInput={handleInputChange}
+      />
+  )
+}
+
+const Form = ({ fields, values, onFieldChange }) => {
+  const handleSubmit = (e) => {
+    e.prevetDefault()
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {fields.map(field => {
+        return (
+          <div className="form-group">
+            <label htmlFor={field.id}>{field.name}</label>
+            <ValueInput field={field} value={values[field.name]} onInputChange={onFieldChange}/>
+          </div>
+        )
+      })}
+    </form>
+  )
+}
+
+class ComponentContainer extends React.Component {
+  state = {
+    values: {},
+  }
+
+  handleFormFieldChange = (fieldName, value) => {
+    this.setState({
+      values: Object.assign({}, this.state.values, {
+        [fieldName]: value,
+      })
+    })
+  }
+
+  render() {
+    console.log(this.state.values)
+    const { Component } = this.props
+    const component = <Component {...this.state.values} />
+    return (
+      <Row>
+        <Form
+          values={this.state.values}
+          fields={getFormFieldsFromPropTypes(Component)}
+          onFieldChange={this.handleFormFieldChange}
+        />
+        <code>
+          <xmp dangerouslySetInnerHTML={{__html: ReactDOMServer.renderToStaticMarkup(component)}}/>
+        </code>
+        {component}
+      </Row>
+    )
+  }
+}
+
+const Components = (props) => {
   return (
     <Container>
       {props.components.map(Component => {
-        {var component = <Component />}
-        return (
-          <Row>
-            {component}
-            <code>
-              <xmp dangerouslySetInnerHTML={{__html: ReactDOMServer.renderToStaticMarkup(component)}}/>
-            </code>
-            {component}
-          </Row>
-        )
+        return <ComponentContainer
+          key={Component.type || Component.name}
+          Component={Component}
+          values={props.values}
+          />
       })}
     </Container>
   )
+}
+
+const getInputTypeOfPropType = (propType) => {
+  switch (propType) {
+    case React.PropTypes.number:
+      return 'number'
+
+    case React.PropTypes.bool:
+      return 'checkbox'
+
+    case React.PropTypes.array:
+      return 'array'
+
+    default:
+      return 'text'
+  }
+}
+
+const getFormFieldsFromPropTypes = (component) => {
+  return Object.keys(component.propTypes || {}).map(key => {
+    const propType = component.propTypes[key]
+    return {
+      type: getInputTypeOfPropType(propType),
+      name: key,
+      id: `${component.type || component.name}__${key}`,
+    }
+  })
 }
 
 
 ReactDOM.render(<Components {...state} />, document.getElementById('app'))
 
 
-//$.getJSON('https://jsonplaceholder.typicode.com/posts/', function(posts) {
+//$.getJSON('https://jsonplaceholder.typicode.com/posts/', const( = posts) { =>
 // })
 
 })()

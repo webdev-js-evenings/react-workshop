@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+<div id="app"></div>
+</body>
+<script>
+function createDOM(document) {
+  return ['div', 'span', 'label', 'p', 'h1', 'input', 'button', 'form'].reduce(function(DOM, tag) {
+    DOM[tag] = function(attrs, children) {
+      var elem = document.createElement(tag)
+      elem = Object.assign(elem, attrs)
+
+      if (typeof children === 'string') {
+        elem.appendChild(document.createTextNode(children))
+      } else {
+        children = children || []
+        children.forEach(function(child) {
+          var child = typeof child === 'string' ? document.createTextNode(child) : child
+          elem.appendChild(child)
+        })
+
+        return elem
+      }
+    }
+
+    return DOM
+  }, {})
+}
+
+var DOM = createDOM(document)
+
+function renderDOM(DOM, elem, fel) {
+  elem.innerHTML = ''
+  elem.appendChild(DOM)
+}
+
+var initialState = {
+  text: 'Hello world na klientovi!!'
+}
+
+
+function renderApp(state) {
+  return DOM.h1({}, [state.text])
+}
+
+// tohle do server.js nekopčit!
+renderDOM(renderApp(initialState), document.getElementById('app'))
+</script>
+</html>

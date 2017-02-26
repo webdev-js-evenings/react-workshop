@@ -330,7 +330,7 @@ Testování pak není problém, prostě jenom zkontrolujete výstup. Není potř
 
 Spolehlivost? No, tak změna jedné třídy v našem "HTML" už nic nerozbije. Aplikace není nijak závislá na selektorech nebo na tom, jak jsou jednotlivé elementy zanořené. Tady už také není problém.
 
-> Tady na tom místě bych chtěl podotknout, že paradoxně tím, že jsme přesunuly vytváření HTML to Javascriptu jsme docílili opravdového **oddělení** JS a HTML.
+> Tady na tom místě bych chtěl podotknout, že paradoxně tím, že jsme přesunuli vytváření HTML to Javascriptu jsme docílili opravdového **oddělení** JS a HTML.
 
 Teď už se logika nijak nemíchá s HTML tak, jako tomu bylo v jQuery příkladu. Nejsme už závislíst na zanoření elementů nebo na unikátnosti jednotlivých selectorů. Navíc tím, že jsme nepoužili klasické šablony, které parsují string a pak ho interpretují sme dostali pod ruku celou moc programovacíme jazyka Javascript a nejsme už nijak omezeni zvlášnostmi implementaci nějakého šablonovacího enginu.
 
