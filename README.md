@@ -5,7 +5,7 @@
 Kurz je rozdělen na několik částí:
 
 1. [Od jQuery po React](./pt.1-jQuery-to-React) (Vojta Tranta [@iVojta](https://twitter.com/ivojta))
-2. ... připravujeme
+2. [Konečně React](./pt.2-React) (Vojta Tranta [@iVojta](https://twitter.com/ivojta))
 
 
 ## Autoři

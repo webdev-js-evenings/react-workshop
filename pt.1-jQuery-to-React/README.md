@@ -183,5 +183,196 @@ Nějakou chytrou technikou by mělo být možné udržet reference na původní 
 
 Zkusíme to!
 
+Kód si prohlédněte a vyzkoušejte [zde](./pt.1-jQuery-to-React/javascript/index.html).
+
+### Přednosti
+#### Sbohem DOMe
+Všechny problémy jQuery a javascriptových šablon jsme vyřešili, jak je to možné? Prve je se potřeba podívat na to, jestli máme nějak spojený aktuální DOM s Javascriptovým kódem.
+
+Odpověď je samozřejmě prostá. DOM není nijak spojený s našim Javascriptem. Jenom v jednom jediném bodě, kdy říkáme, kam se má komponenta vyrenderovat. Bez takové obezličky bychom se ale neobešli, navíc kód, který tuhle obezličku využívá je triviální:
+```js
+function renderDOM(newDOM, element) {
+  element.innerHTML = ''
+  element.appendChild(newDom)
+}
+
+var nextDOM = createDOM({ ... })
+
+renderDOM(nextDOM, document.getElementById('app'))
+```
+Tenhle kus kódu v sobě **nemá** ani kousek business logiky. To, jak se aplikace chová nebo jak vypadá je obsaženo pouze ve funkci `createDOM()`, která pouze a jenom vytváří HTML tagy - v našem případě rovnou vytváří instance elementů přes `document.createElement()` - takže by se závislost na `document` dala brát jako závislost na DOMu. To ovšem je ale nesmysl, protože objekt `DOM`, který používáme na vytváření DOMu, tedy tento:
+```js
+function createDOM(props) {
+  return DOM.div({}, 'Ahoj!')
+}
+```
+Se dá funkci předat jak parametr:
+```js
+function createDOM(DOM, props) {
+  return DOM.div({}, 'Ahoj!')
+}
+```
+A co to znamená? No to znamená prostě jenom to, že by pro mě nebyl problém vytvořit takovou implementaci objektu `DOM`, která by vracela místo JS objektů pouhé stringy elementů: `<div>Ahoj!</div>`. Jak?
+```js
+// původní vytváření objektu DOM používá globální document
+// document si ale můžeme naimplementovat jinak a předat ho do createDOM()
+var createElement = (tag) => {
+  var children = []
+  var attrs = {}
+  return {
+    innerHTML: '',
+
+    toString: function() {
+      return `<${tag}${this.getAttrs()}>${children.map((child) => child.toString()).join('')}</${tag}>`
+    },
+
+    getAttrs: function() {
+      var ret = []
+      Object.keys(attrs).forEach(key => {
+        var value = attrs[key]
+        if (key.toLowerCase() == 'classname') {
+          value = String(attrs[key])
+          key = 'class'
+        }
+
+        ret.push(`${key}="${value}"`)
+      })
+      if (ret.length > 0) {
+        return ` ${ret.join(' ')}`
+      }
+      return ''
+    },
+
+    appendChild: function(child) {
+      children.push(child)
+    },
+  }
+}
+
+// název serverDocument protože takováto implementace je snadno použitelná na serveru
+var serverDocument = {
+  createElement: createElement,
+}
 
 
+//definice createDOM()
+function createDOM(document) {
+  return ['div', 'span', 'label', 'p', 'input', 'button', 'form'].reduce(function(DOM, tag) {
+    DOM[tag] = function(attrs, children) {
+      var elem = document.createElement(tag)
+      elem = Object.assign(elem, attrs)
+
+      if (typeof children === 'string') {
+        elem.appendChild(document.createTextNode(children))
+      } else {
+        children = children || []
+        children.forEach(function(child) {
+          var child = typeof child === 'string' ? document.createTextNode(child) : child
+          elem.appendChild(child)
+        })
+
+        return elem
+      }
+    }
+
+    return DOM
+  }, {})
+}
+
+// pro vytvářní stringových elementů místo DOM objektů pak stačí jen toto
+var DOM = createDOM(serverDocument)
+
+DOM.div({className: 'ahoj-class'}, 'ahoj') // -> string: <div class="ahoj-class">ahoj</div>
+```
+Nyní nám je zcela jedno, co dokáže `document`, prostě si ho naimplementujeme jak potřebuje pro jakékoliv prostředí.
+
+Kód jsem vzal odtud: https://github.com/vojtatranta/supertiny-app-lib.
+
+Tedy zcela jsme se izolovaly od DOMu jako takového.
+#### API, Testovatelnost, spolehlivost
+API nyní definujeme jako u jakékoliv jiné javascriptové funkce - type hinty sice v Javascriptu nejsou, ale můžeme si je přidat typescriptem nebo Flow typem. Takže s trochou představivosti můžeme říct, že třeba funkce pro vypsání jména uživatele vypadá takto:
+```js
+function UserBlock(userName, email, userId, onUserClick) {
+  function handleUserClick() {
+    onUserClick(userId) // pošleme do handleru sémantickou informace na jakého Usera bylo kliknuto podle jeho ID
+  }
+
+  return DOM.div({
+    className: 'user-block',
+    onclick: handleUserClick,
+  },
+    DOM.strong({}, 'User name:'), DOM.span({}, userName), DOM.br({}),
+    DOM.strong({}, 'E-mail:'), DOM.span({}, email), DOM.br({}),
+    DOM.strong({}, 'Photo:'), Gravatar(email)
+  )
+}
+
+// použití
+function renderHeader(userData, getAPIUserDetails) {
+
+  // tato funkce se zavolá po kliknutí všimněte si, že ji posíláme jako callback do UserBlock
+  function onUserDetailRequest(userId) {
+    getAPIUserDetails(userId) // získáme data z user api
+      .then((userData) => {
+        console.log(userData)
+      })
+  }
+
+  return DOM.div({
+    className: 'header',
+  }, UserBlock(userData.userName, userData.email, userData.id, onUserDetailRequest))
+}
+```
+Nejenže jsme definovali, jaká data tečou do šablony a jaká se tedy vykreslí. Dokonce píšeme vše v Javascriptu, takže nám JSko pěkně hlásí chyby, když nějaké uděláme, né jako Handlebars. Můžeme využít nástroje jako `eslint` pro kontrolu kódu a upravnit tragičnost jazyka JávaScrypt.
+
+Testování je triviální. Všechny funkce jsou čisté, prostě jim dát nějaké parametry a ony vám vrátí kus HTML, ať už jako string nebo jako DOM objekty.
+Testování pak není problém, prostě jenom zkontrolujete výstup. Není potřeba vytvářet nějaký mock celého HTML ani žádnou podobnou šílenost. Navíc se dají funkce skládat jako lego a pokud otestujete jednu funkci, tak víte, že se těžko něco rozbije, pokud jich dáte více dohromady. K dokonalosti tu chybí jen tvrdé typování, toho s v Javascriptu asi nedočkáme, ale má ho třeba geniální jazyk [Elm](http://elm-lang.org/), doporučuji ho vyzkoušet!
+
+Spolehlivost? No, tak změna jedné třídy v našem "HTML" už nic nerozbije. Aplikace není nijak závislá na selektorech nebo na tom, jak jsou jednotlivé elementy zanořené. Tady už také není problém.
+
+> Tady na tom místě bych chtěl podotknout, že paradoxně tím, že jsme přesunuly vytváření HTML to Javascriptu jsme docílili opravdového **oddělení** JS a HTML.
+
+Teď už se logika nijak nemíchá s HTML tak, jako tomu bylo v jQuery příkladu. Nejsme už závislíst na zanoření elementů nebo na unikátnosti jednotlivých selectorů. Navíc tím, že jsme nepoužili klasické šablony, které parsují string a pak ho interpretují sme dostali pod ruku celou moc programovacíme jazyka Javascript a nejsme už nijak omezeni zvlášnostmi implementaci nějakého šablonovacího enginu.
+
+### Problémy
+Bohužel, všechno má svoje pro a proti. Najednou už nemáme žádné HTML a všechno píšeme v Javascriptu. Srdce programátora jásá, kodér pláče. Je pravdou, že pokud jste do teď uměli jenom HTML a CSS a sem tam jste něco naprasili v jQuery, tak taková znalosti už vám tady přestávají stačit. Na druhou stranu, vždycky je dobré se něco naučit, obzvlášť v oblasti Javascriptu. Otevírá to obrovské možnosti. Jak jsem psal ve svém článku [Kam došel svět frontendu do ledna 2016](https://medium.com/@vojta/kam-do%C5%A1el-sv%C4%9Bt-frontendu-do-1-2016-f84cbff1156#.4mrykl9lm).
+
+Je samozřejmě potřeba si přiznat, že taktov vytvořené HTML opravdu není dvakrát čitelné. Všude jsou jenom volání funkcí, která jen opravdu vzdáleně připomínají nějaké HTML. Podle mého názoru se v tomto kódu dá vyznat lépe, než pokud použijeme jQuery přístup navazování business logiky. Nicméně tento kód už není zdaleka tak podobný HTML jako klasické šablony a jehorší v něm najít, kde jaký `<div>` začíná a kde končí. Je těžké všechno správě uzávorkovat. Zkrátka by asi bylo o trošku lepší mít něco, co je stejně čitelné jako šablona, ale přitom mocné jako Javascript.
+
+Prázdné HTML? Ano, to je velký problém. Naše aplikace se vypíše až v prohlížeči. To znamená, že tím trpí SEO a i výkon, protože aplikace v prohlížeči musí nejdřív stáhnout Javascript, aby se dokázala vůbec vykreslit. Naštěstí dokážeme naimplementovat renderování šablony na straně serveru poměrně jednoduše, takže to není takový problém. Horší oříšek je to, jak správě dostávat data do šablony, aby na každé stránce bylo zajištěno že má data, která potřebuje a ani víc ani méně. Tohel se snaží vyřešit [Relay](https://facebook.github.io/relay/) a [GraphQL](http://graphql.org/learn/). A není to zrovna lehký úkol...
+
+Další problém je to, že v zájmu jednoduchosti pokaždé vytváříme celé nové HTML aplikace při každé změně. To má za následek to, že pokud bychom chtěli měnit stav aplikaci při každém zmačknutí klávesy nad inputem, tak by to znamenalo, že se pokaždé překreslí celá aplikace. To je samozřejmě dost zbytečné, stačilo by, kdyby se překreslil jen ten kousek, který se změnil.
+
+Navíc neustálé nahrazování DOMu za jiný má důsledky i v tom, že jakmile něco napíšu do inputu, tak ztratím i focus, protože se nahradí input element jinou instancí....
+
+### Hodnocení přístupu s pouhým Javascriptem
+
+#### Testovatelnost - 1
+Tady není co dodat. Čistá funkce se testuje naprosto triviálně. Stačí ji zavolat s argumenty a zkontrolovat výstup.
+
+Případné callbacky se testují také snadno - najde se element s callbackem a zavolá se s danými parametry.
+
+#### Jednoduchost - 2
+Tohle je asi kontroverzní část. Sic je potřeba dost kódu na to, abychom něco takového rozběhali, ale nakonec je pak triviální psát jakékoliv UI. Narozdíl od jQuery se ale postupné přidávání feature nekomplikuje a přidat další kus UI je jenom o tom zavolat další funkci.
+
+Samozřejmě v neprospěch jednoduchosti hovoří to, že nepíšeme nic podobného HTML. Voláme funkce v Javascriptu a s tím si celá řada kodéru prostě nemusí poradit. Zkrátka nyní potřebujeme frontendové programátory, kodéři nám už nestačí a to může být komplikace.
+
+Sice by se dalo říct, že rozdělení UI do komponent vše zjednodušuje, už nemáme dlouhé špagety HTML šablon, ale i tak volím **2**, protože je mi jasné že s tím budou v agenturách problémy.
+
+#### Spolehlivost - 1
+Jak jsem psal výše, změna struktury HTML nebo změna třídy na elementu nic nerozbije. Navíc se dají snadno napsat testy. Spolehlivost tedy není problém.
+#### Znovupoužitelnost - 1
+Nic není znovupoužitelnějšího než jednoduchá matematická funkce. O tom zkrátka není sporu. A naše UI je tvořeno pouze funkcemi, které vracejí strukturu DOMu. Takže stačí pouze funkci vzít a použít jí jinde. Či psát funkce pro layout obecně a můžeme si vytvořit vlastní knihovnu pro tvoření layoutu tak, že může být naimplementovaná pro bootstrap či pro flexbox.
+### Verdikt - Pouhý Javascript - průměr 1,25
+Celkový dojem pouze kalí to, že tyhle javascriptové "šablony" nejsou tak perfektně čitelné a vypadají cize ve srovnání s HTML šablonami. K tomu jsou ještě problémy s výkonem v tom smyslu, že při každé změně stavu překreslujeme celé HTML celé aplikace a to prostě zbytečné mrhní prostředky a ztrácíme focus na elementech apod.
+
+Jinak jsme všechny problémy vyřešili. Máme definované API, kód je testovatelný, máme po ruce mocný Javascript, nejsme závislí nijak na DOMu.
+
+Takže k téměř dokonalého šablonování nám chybí ještě toto:
+- dokopat Javascript ke kontrole typů argumentů, chodících do šablon
+- zefektivnit vykreslování šablony - aby se upravilo jen to, co je potřeba a udržovaly se instance inputů, aby neztrácely focus apod.
+- přidat možnost psát šablony v přívětivějším duchu tak, aby kodéři neprskali
+## Co teď?
+Tohle už jsou netriviální problémy, se kterýma si těžko poradíme v dvouhodinnovém kurzu. Těžko tady naimplementujeme algoritmus pro aktualizaci DOMu jen v místech, kde se něco změnilo nebo těžko donutíme Javasript kontrolovat typy.
+
+Ovšem nic z toho nás nemusí trápit, všechny tyhle problémy už řeší nejslavnější [UI knihovna React](https://facebook.github.io/react/) a o té se povíme v [další části](../pt.2-React).

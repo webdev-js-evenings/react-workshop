@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./style.css">
+  <title>Javascript only</title>
+</head>
+<body>
+<div id="app"></div>
+
+</body>
+<script>
+!function() {
+function createDOM(document) {
+  return ['div', 'span', 'label', 'p', 'input', 'button', 'form'].reduce(function(DOM, tag) {
+    DOM[tag] = function(attrs, children) {
+      var elem = document.createElement(tag)
+      elem = Object.assign(elem, attrs)
+
+      if (typeof children === 'string') {
+        elem.appendChild(document.createTextNode(children))
+      } else {
+        children = children || []
+        children.forEach(function(child) {
+          var child = typeof child === 'string' ? document.createTextNode(child) : child
+          elem.appendChild(child)
+        })
+
+        return elem
+      }
+    }
+
+    return DOM
+  }, {})
+}
+
+//API: DOM.div({ className: 'ahoj' }, [DOM.span({}, 'ahoj')]) -> <div class="ahoj"></div>
+var DOM = createDOM(document)
+var appElement = document.getElementById('app')
+
+function renderDOM(DOM, elem, fel) {
+  var focusedElem = document.activeElement
+  var childNode = elem.childNodes[0]
+  if (childNode) {
+    elem.removeChild(childNode)
+  }
+
+  elem.appendChild(DOM)
+  focusedElem.focus()
+}
+
+
+function createDispath(initialState, renderFn) {
+  return function(stateUpdate) {
+    var newState = Object.assign({}, initialState, stateUpdate)
+    renderFn(newState, createDispath(newState, renderFn))
+  }
+}
+
+
+var defaultData = {
+  vars: [
+    { name: 'text', type: 'text' },
+    { name: 'droped', type: 'checkbox' },
+    { name: 'options', type: [{ name: 'text', type: 'string' }] }
+  ],
+}
+
+var d = null
+function createForm(formFn) {
+  var formElem = null
+
+  function flush() {
+    formElem = null
+  }
+
+  return function() {
+    if (!formElem) {
+      formElem = formFn.apply(null, Array.prototype.slice.call(arguments).concat([flush]))
+    }
+
+    return formElem
+  }
+}
+
+function form(data, dispatch, flush) {
+  function handleSubmit(e) {
+    e.preventDefault()
+    formData = $(e.target).serializeArray()
+    dispatch({ submitted: formData })
+  }
+
+  function handleInput(e) {
+    dispatch({ input: e.target.value })
+  }
+
+  return DOM.form({
+    id: 'vars-form',
+    onsubmit: handleSubmit,
+  }, data.vars.map(function(varDeff) {
+      return DOM.div({
+        className: 'form-group',
+      }, [
+        DOM.label({}, [varDeff.name]),
+        DOM.input(Object.assign({
+          className: 'form-control',
+          oninput: handleInput,
+          value: data.input || '',
+        }, varDeff))
+      ])
+    }).concat([
+      DOM.button({
+        className: 'btn btn-success',
+      }, ['Render'])
+    ])
+  )
+}
+
+var cachedForm = createForm(form)
+function app(data, dispatch) {
+  return DOM.div({},
+    [
+      DOM.p({}, [data.submitted || '']),
+      cachedForm(data, dispatch)
+    ]
+  )
+}
+
+
+renderDOM(app(defaultData, createDispath(defaultData, function(state, dispatch) {
+  renderDOM(app(state, dispatch), appElement, document.activeElement)
+})), appElement)
+
+
+}()
+</script>
+</html>

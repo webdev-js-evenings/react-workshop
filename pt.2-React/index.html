@@ -60,7 +60,7 @@ function Row(props) {
 }
 
 
-function ReactComponent(props) {
+function Components(props) {
   return (
     <Container>
       {props.components.map(Component => {
@@ -79,9 +79,12 @@ function ReactComponent(props) {
   )
 }
 
-$.getJSON('https://jsonplaceholder.typicode.com/posts/', function(posts) {
-  ReactDOM.render(<ReactComponent {...state} />, document.getElementById('app'))
-})
+
+ReactDOM.render(<Components {...state} />, document.getElementById('app'))
+
+
+//$.getJSON('https://jsonplaceholder.typicode.com/posts/', function(posts) {
+// })
 
 })()
 </script>
