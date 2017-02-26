@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>React!</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- tady -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://unpkg.com/react@15/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom-server.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- tady -->
+
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script type="text/babel" data-presets="es2015,stage-0,react">
+(function() {
+// tady
+var DOM = React.DOM
+var div = DOM.div
+// ---
+
+function Button(props) {
+  return (
+    <button className="btn btn-danger text-target">
+      {props.text || 'This is default text'}
+    </button>
+  )
+}
+
+var state = {
+  components: [Button]
+}
+
+
+function Container(props) {
+  return (
+    <div className="container">
+      {props.children}
+    </div>
+  )
+}
+
+function Row(props) {
+  return (
+    <div className="row">
+      {(props.children || []).map(child => {
+        return (
+          <div className={`col-md-${Math.round(12 / props.children.length)}`}>
+            {child}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+
+function ReactComponent(props) {
+  return (
+    <Container>
+      {props.components.map(Component => {
+        {var component = <Component />}
+        return (
+          <Row>
+            {component}
+            <code>
+              <xmp dangerouslySetInnerHTML={{__html: ReactDOMServer.renderToStaticMarkup(component)}}/>
+            </code>
+            {component}
+          </Row>
+        )
+      })}
+    </Container>
+  )
+}
+
+$.getJSON('https://jsonplaceholder.typicode.com/posts/', function(posts) {
+  ReactDOM.render(<ReactComponent {...state} />, document.getElementById('app'))
+})
+
+})()
+</script>
+
+</html>
