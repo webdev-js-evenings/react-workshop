@@ -332,7 +332,7 @@ Spolehlivost? No, tak změna jedné třídy v našem "HTML" už nic nerozbije. A
 
 > Tady na tom místě bych chtěl podotknout, že paradoxně tím, že jsme přesunuli vytváření HTML to Javascriptu jsme docílili opravdového **oddělení** JS a HTML.
 
-Teď už se logika nijak nemíchá s HTML tak, jako tomu bylo v jQuery příkladu. Nejsme už závislíst na zanoření elementů nebo na unikátnosti jednotlivých selectorů. Navíc tím, že jsme nepoužili klasické šablony, které parsují string a pak ho interpretují sme dostali pod ruku celou moc programovacíme jazyka Javascript a nejsme už nijak omezeni zvlášnostmi implementaci nějakého šablonovacího enginu.
+Teď už se logika nijak nemíchá s HTML tak, jako tomu bylo v jQuery příkladu. Nejsme už závislíst na zanoření elementů nebo na unikátnosti jednotlivých selectorů. Navíc tím, že jsme nepoužili klasické šablony, které parsují string a pak ho interpretují sme dostali pod ruku celou moc programovacíme jazyka Javascript a nejsme už nijak omezeni zvlášnostmi implementací nějakého šablonovacího enginu.
 
 ### Problémy
 Bohužel, všechno má svoje pro a proti. Najednou už nemáme žádné HTML a všechno píšeme v Javascriptu. Srdce programátora jásá, kodér pláče. Je pravdou, že pokud jste do teď uměli jenom HTML a CSS a sem tam jste něco naprasili v jQuery, tak taková znalosti už vám tady přestávají stačit. Na druhou stranu, vždycky je dobré se něco naučit, obzvlášť v oblasti Javascriptu. Otevírá to obrovské možnosti. Jak jsem psal ve svém článku [Kam došel svět frontendu do ledna 2016](https://medium.com/@vojta/kam-do%C5%A1el-sv%C4%9Bt-frontendu-do-1-2016-f84cbff1156#.4mrykl9lm).

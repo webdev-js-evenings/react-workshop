@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>React!</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- tady -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://unpkg.com/react@15/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom-server.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- tady -->
+
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script type="text/babel" data-presets="es2015,stage-0,react">
+(function()  {
+class Counter extends React.Component {
+  state = {
+    count: 0,
+  }
+
+  handleClick = () => {
+    this.setState({
+      count: this.state.count + 1,
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <button className="btn btn-success"
+          onClick={this.handleClick}
+        >{`You clicked: ${this.state.count} times`}</button>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<Counter />, document.getElementById('app'))
+})()
+</script>
+
+</html>
