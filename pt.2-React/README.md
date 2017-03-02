@@ -70,7 +70,7 @@ V podstatě jde jenom o to nahradit:
 var DOM = createDOM()
 
 // Reactí
-var DOM = ReactDOM
+var DOM = React.DOM
 
 // a místo
 renderApp(dom, appElement)
@@ -86,7 +86,7 @@ Abychom získali všechny globální proměnné, které jsou potřeba, stačí p
 <script src="https://unpkg.com/react-dom@15/dist/react-dom-server.js"></script>
 <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 ```
-No a pokud jste vše pečlivě nahradilim měla by se vám tedy v souboru íbasic.html](./basic.html) zobrazit to samé, co bez Reactu.
+No a pokud jste vše pečlivě nahradilim měla by se vám tedy v souboru [basic.html](./basic.html) zobrazit to samé, co bez Reactu.
 
 Takže co, je to teda těžké nebo ne?
 

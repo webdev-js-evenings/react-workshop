@@ -19,14 +19,33 @@
 </body>
 <script type="text/babel" data-presets="es2015,stage-0,react">
 (function()  {
+const project = {
+  id: 123,
+  name: 'My Project'
+}
+
 class Counter extends React.Component {
   state = {
-    count: 0,
+    count: this.props.count,
+  }
+
+  componentDidMount() {
+    store.addEventListner('change', this._handleChange)
+  }
+
+  _handleChange = () => {
+    this.setState({
+      project: store.getProjectById(this.props.projectId)
+    })
+  }
+
+  static defaultProps = {
+    count: 1111
   }
 
   handleClick = () => {
     this.setState({
-      count: this.state.count + 1,
+      count: (this.state.count || this.props.count) + 1,
     })
   }
 
@@ -34,14 +53,17 @@ class Counter extends React.Component {
     return (
       <div>
         <button className="btn btn-success"
-          onClick={this.handleClick}
-        >{`You clicked: ${this.state.count} times`}</button>
+        onClick={this.handleClick}
+        >{`You clicked: ${this.state.count || this.props.count } times`}</button>
       </div>
     )
   }
 }
 
-ReactDOM.render(<Counter />, document.getElementById('app'))
+
+
+
+ReactDOM.render(<Counter projectId={33}/>, document.getElementById('app'))
 })()
 </script>
 

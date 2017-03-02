@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>React!</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- tady -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://unpkg.com/react@15/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/react-dom@15/dist/react-dom-server.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- tady -->
+
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script type="text/babel" data-presets="es2015,stage-0,react">
+(function()  {
+const Prednaska = () => {
+  return (
+    <div>
+      <h1>WebDev - Naučte se React.js!</h1>
+      <h2>Konečně na React! Jednoduše...</h2>
+      <ul>
+        <li>Začínáme v 19:45</li>
+        <li><strong>sli.do: <a href="https://app.sli.do/event/6o72w764">https://app.sli.do/event/6o72w764</a></strong></li>
+        <li>Občerstvení zdarma, plňte igelitky! :-D</li>
+        <li>Video bude! (první část čeká jenom na uploadování!)</li>
+        <li><strong>twitter.com (na Androidu)</strong></li>
+        <li>FB Skupina: fb.com/groups/webdevjs</li>
+        <li>Wifi: <strong>Avocode Guest</strong></li>
+        <li>Materiály: <a href="https://github.com/webdev-js-evenings/react-workshop">https://github.com/webdev-js-evenings/react-workshop</a></li>
+        <li>Máte repozitář stažený a nainstalovaný?!</li>
+        <li>Příští přednášku má: Petr Brzek, termín bude upřesněn.</li>
+        <li>Dneska naposledy Vojta Tranta (@iVojta)</li>
+      </ul>
+      <h3>Díky patří:</h3>
+      <ul>
+        <li>Avocode za prostory</li>
+        <li>Kláře, Jance a Jonášovi za přípravu</li>
+      </ul>
+    </div>
+  )
+}
+
+ReactDOM.render(
+  <Prednaska />, document.getElementById('app'))
+})()
+</script>
+
+</html>

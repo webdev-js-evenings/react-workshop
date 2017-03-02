@@ -28,7 +28,7 @@ class StringElement {
   }
 
   toString() {
-    return `<${this.tag} ${this.attrsToString()}>${this.children.map(child => child.toString())}</${this.tag}>`
+    return `<${this.tag} ${this.attrsToString()}>${this.children.map(child => child.toString()).join('')}</${this.tag}>`
   }
 }
 
@@ -42,9 +42,43 @@ const serverDocument = {
   }
 }
 
+function createDOM(document) {
+  return ['div', 'span', 'label', 'p', 'h1', 'input', 'button', 'form'].reduce(function(DOM, tag) {
+    DOM[tag] = function(attrs, children) {
+      var elem = document.createElement(tag)
+      elem = Object.assign(elem, attrs)
+
+      if (typeof children === 'string') {
+        elem.appendChild(document.createTextNode(children))
+      } else {
+        children = children || []
+        children.forEach(function(child) {
+          var child = typeof child === 'string' ? document.createTextNode(child) : child
+          elem.appendChild(child)
+        })
+
+        return elem
+      }
+    }
+
+    return DOM
+  }, {})
+}
+
+var DOM = createDOM(serverDocument)
+
+function renderDOM(DOM, elem, fel) {
+  elem.innerHTML = ''
+  elem.appendChild(DOM)
+}
+
+
+function renderApp(state) {
+  return DOM.span({}, [state.text])
+}
 
 app.get('*', (req, res) => {
-  res.send(html.replace('{HTML}', 'SERVER'))
+  res.send(html.replace('{HTML}', renderApp({ text: 'Jiný text' })))
 })
 
 app.listen(9999, () => {

@@ -5,7 +5,11 @@
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="./style.css">
-
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://unpkg.com/react@15/dist/react.js"></script>
+<script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+<script src="https://unpkg.com/react-dom@15/dist/react-dom-server.js"></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
   <title>Javascript only</title>
 </head>
 <body>
@@ -14,37 +18,8 @@
 </body>
 <script>
 !function() {
-function createDOM(document) {
-  return ['div', 'span', 'h1', 'h2', 'label', 'p', 'input', 'button', 'form'].reduce(function(DOM, tag) {
-    DOM[tag] = function(attrs, children) {
-      var elem = document.createElement(tag)
-      elem = Object.assign(elem, attrs)
-
-      if (typeof children === 'string') {
-        elem.appendChild(document.createTextNode(children))
-      } else {
-        children = children || []
-        children.forEach(function(child) {
-          var child = typeof child === 'string' ? document.createTextNode(child) : child
-          elem.appendChild(child)
-        })
-
-        return elem
-      }
-    }
-
-    return DOM
-  }, {})
-}
-
-
-var DOM = createDOM(document)
+var DOM = React.DOM
 var appElement = document.getElementById('app')
-
-function renderDOM(DOM, elem) {
-  elem.innerHTML = ''
-  elem.appendChild(DOM)
-}
 
 
 function createDispath(initialState, renderFn) {
@@ -89,9 +64,11 @@ function app(data, dispatch) {
 }
 
 
-renderDOM(app(defaultData, createDispath(defaultData, function(state, dispatch) {
-  renderDOM(app(state, dispatch), appElement, document.activeElement)
-})), appElement)
+ReactDOM.render(React.createElement(app, defaultData), appElement)
+
+// renderDOM(app(defaultData, createDispath(defaultData, function(state, dispatch) {
+//   renderDOM(app(state, dispatch), appElement, document.activeElement)
+// })), appElement)
 
 
 }()
