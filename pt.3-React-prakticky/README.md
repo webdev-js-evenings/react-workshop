@@ -2,11 +2,13 @@
 
 ## Teoretická část a prezentace
 
+**(Obrázek je klikatelný odkaz)**
 <a href="https://docs.google.com/presentation/d/1yuErzAASiDOWwvsODUVOPF1E8Xb6ji8LBqbcVSLp2zw/edit?usp=sharing">
   <img src="https://cldup.com/ityiYfRcKR-3000x3000.png" height="300">
 </a>
-  
-(Obrázek je klikatelný odkaz)
+ 
+**[Prezentace React prakticky](https://docs.google.com/presentation/d/1yuErzAASiDOWwvsODUVOPF1E8Xb6ji8LBqbcVSLp2zw/edit?usp=sharing)**
+
 
 ## Praktická část
 
