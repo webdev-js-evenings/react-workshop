@@ -7,6 +7,7 @@ Kurz je rozdělen na několik částí:
 1. [Od jQuery po React](./pt.1-jQuery-to-React) (Vojta Tranta [@iVojta](https://twitter.com/ivojta))
 2. [Konečně React](./pt.2-React) (Vojta Tranta [@iVojta](https://twitter.com/ivojta))
 2. [React prakticky](./pt.3-React-prakticky) (Petr Brzek [@petrbrzek](https://twitter.com/petrbrzek))
+2. [React - správa stavu aplikace](./pt.4-React-sprava-stavu) (Vojta Tranta [@iVojta](https://twitter.com/ivojta))
 
 
 ## Autoři
