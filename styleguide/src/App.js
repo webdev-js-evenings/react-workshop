@@ -17,7 +17,6 @@ class ComponentContainer extends Component {
   }
 
   render() {
-    console.log(this.state)
     const formFields = getFormFieldsFromPropTypes(this.props.component)
     const component = <this.props.component {...this.state} />
 

@@ -102,12 +102,12 @@ Je to jednoduché, místo toho, aby komponenta renderovala všechno, tak si vybe
 Takováto architektura může připomínat klasický `Presenter` nebo `Controller`, který můžete znát z jiných jazyků či frameworků:
 ```php
 class Controller extends BaseController {
-  __construct($todoFacade, $context) {
+  function __construct($todoFacade, $context) {
     $this->todoFacade = $todoFacade;
     $this->context = $context;
   }
 
-  public index($request) {
+  public function index($request) {
     return $this->_createResponse($request, 'templates/index', [
       'page_title' => 'Index page!',
       'todos' => $this->todoFacade->getTodos($request.get('page')),
@@ -463,3 +463,8 @@ Voila!
 Pěkně jsme si zcela oddělili modelovou vrstvu a view vrstu a znatelně jsme rozsekali Controller. Z toho zbyla jenom čistá funkce, která pouze jenom předává data tam a callbacky je vrací zpátky.
 
 Tohle je opravdu elegantní řešení a dá se povýšit ještě o úroveň výše no a to si povíme příště...
+
+## Co bude příště
+Nyní máme stav celé komponenty "přichycený" pouze na hlavní první root komponentě. To není tak špatné, ale jak aplikace roste a přidáme například taby nebo stránky, tak zjistíme, že by se hodilo mít tento stav přichycený k jiným komponentám, například k jednotlivým stránkám.
+
+No a to si ukážeme příště, jak "koukat" na stav z více míst v aplikaci pomocí neviditelného `contextu`.
