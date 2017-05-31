@@ -95,7 +95,7 @@ Další prvek vylepšení funkcí by mohlo být oddělení toho, jak se vytvář
 --WebSocket-->  C     Naše apka     C  <-----history.push()---
                 E                   E
                 |                   |
-                --------AKCE---------
+                ---------AKCE--------
 ```
 To sem hezky nakreslil!
 
@@ -202,6 +202,36 @@ class ApiContextProvider extends React.PureComponet {
 Takováhle komponenta pouze vezme svoje props a hodí je do contextu, aby byly přístupny hluboko v DOMu bez nutnosti je předávat.
 
 Této vlastnosti využijeme, abychom už ale naprosto oddělili stav aplikace od Reactu a jeho API.
+
+#### Connect
+Connect bude dekorátor, kterým obalíme komponentu proto, aby byla schopná přijmout data z jednoho hlavní storu kdekoliv ve stromu komponent. Tedy ne už někde na vrcholu stromu, ale klidně někde hluboko ve stromu. API si předtavuji takto:
+```js
+class ConnectedReactComponent extends React.Component {
+  render() {
+    console.log(this.props.invoicesFromTheStore)
+
+    return (...)
+  }
+}
+
+connect({
+  'invoices': 'invoicesFromTheStore', // klíč - klíč ve stavu, hodnota - název klíče v props, který půjde do componenty
+}, actions)(ConnectedReactComponent)
+```
+Voila, elegantní, že? Samozřejmě komponenta se bude chovat porádně stejně jako každá jiná, jen bude trošku obohacena o pár klíčů ze Store.
+
+Druhý parametry funkce `connect()` bude objekt s akcemi, ty pak přijdou do komponenty jako props:
+```js
+connnect(propsFromStore, {
+  'onInvoiceAdd': () => ({ // V komponentě pak bude tahle funkce přístupná jako props.onInvoiceAdd
+    'invoice': { // výseledek volání funkce bude přímu dispatchnut přes store
+      price: 300,
+      VAT: 21,
+    }
+  })
+})(ConnectReactComponent)
+```
+
 
 ### Gimme da Store
 Takže store nebude nic jiného než event emitter, který bude mít referenci na stav a bude ho průběžně měnit:
@@ -311,4 +341,12 @@ new Store(initialState, reducer)
 ```
 A to je všechno! Máme naprosto luxusní nový store, který umí naprosto všechno, co naše aplikace bude pro změnu stavu potřebovat. Fakt!
 
-Teď si to dáme hezky všechno dohromady...
+Teď si to dáme hezky všechno dohromady, to znamená, že si vytvoříme:
+- `StoreContextProvider`
+- `Store`
+- `Actions creators`
+- `connect()` funkce pro pro spojování komonent se storem kdekoliv ve stromu
+
+Tak si napimplementujeme přidávání Faktur. Mělo by to fungovat tak, že klikneme na tlačítku `Přidat fakturu`, vyskočí modální okno a tam bude jednoduchý formulář pro přidání faktury.
+
+Do toho! Uvidíme co stihneme, příště to napojíme na Firebasku a live updaty!

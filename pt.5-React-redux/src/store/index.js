@@ -1,3 +1,6 @@
+import React from 'react'
+
+
 export const initialData = {
   vatRatio: 21,
   invoices: [{
@@ -20,6 +23,45 @@ export const initialData = {
   }
 }
 
+
+export const connect = (stateToProps = {}, actions = {}) => (Component) => {
+  return class extends React.PureComponent {
+    static contextTypes = {
+      store: React.PropTypes.object.isRequired,
+    }
+
+    state = {}
+
+    componentDidMount() {
+      this.context.store.listen(this._handleStoreChange)
+    }
+
+    componentWillUnmout() {
+      this.context.store.unlisten(this._handleStoreChange)
+    }
+
+    _handleStoreChange = () => {
+      const stateKeys = Object.keys(stateToProps)
+      const state = stateKeys.reduce((state, stateKey) => {
+        return {
+          [stateToProps[stateKey]]: state[stateKey], // transform to keys from stateProps = {'stateKey': 'propsKey'}
+        }
+      }, this.context.store.getState(Object.keys(stateKeys)))
+
+      this.setState(state)
+    }
+
+    render() {
+      const props = {
+        ...this.state,
+        ...this.props,
+      }
+
+      return <Component {...props} />
+    }
+  }
+}
+
 class Store {
   _listeners = []
   _state = {}
@@ -37,8 +79,16 @@ class Store {
     this._listeners.push(listener)
   }
 
-  getState() {
-    return this._state
+  unlisten(listener) {
+    this._listeners = this._listeners.filter(candidate => candidate !== listener)
+  }
+
+  getState(keys = []) {
+    return keys.reduce((state, key) => {
+      return {
+        [key]: state[key],
+      }
+    }, this._state)
   }
 
   dispatch(action) {
@@ -48,4 +98,4 @@ class Store {
 }
 
 
-export default (initialState) => new Store(initialState)
+export default (initialState, reducer) => new Store(initialState, reducer)

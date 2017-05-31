@@ -2,7 +2,7 @@ import React from 'react'
 
 
 const TaxesCalculator = ({ income, tax, taxRatio, costsRatio }) => {
-  console.log(income)
+
   return (
     <table>
       <tbody>
