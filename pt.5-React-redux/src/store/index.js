@@ -16,6 +16,8 @@ export const initialData = {
     taxRatio: 15,
     tax: 7380,
   },
+  nextInvoice: {
+  },
   user: {
     username: '',
     id: 0,
@@ -25,12 +27,12 @@ export const initialData = {
 
 
 export const connect = (stateToProps = {}, actions = {}) => (Component) => {
-  return class extends React.PureComponent {
+  return class extends React.Component {
     static contextTypes = {
       store: React.PropTypes.object.isRequired,
     }
 
-    state = {}
+    state = this.context.store.getState()
 
     componentDidMount() {
       this.context.store.listen(this._handleStoreChange)
@@ -51,10 +53,22 @@ export const connect = (stateToProps = {}, actions = {}) => (Component) => {
       this.setState(state)
     }
 
+    _prepareActions() {
+      const actionKeys = Object.keys(actions)
+      return actionKeys.reduce((wrappedActions, actionKey) => {
+        wrappedActions[actionKey] = (...args) => {
+          this.context.store.dispatch(actions[actionKey](...args))
+        }
+
+        return wrappedActions
+      }, {})
+    }
+
     render() {
       const props = {
         ...this.state,
         ...this.props,
+        ...this._prepareActions(),
       }
 
       return <Component {...props} />
@@ -69,6 +83,7 @@ class Store {
 
   constructor(initialState, reducer) {
     this._state = initialState
+    this._reducer = reducer
   }
 
   _emitChange() {
@@ -93,6 +108,7 @@ class Store {
 
   dispatch(action) {
     this._state = this._reducer(this._state, action)
+    console.info('Action dispatched:', action.action, action.payload, this._state)
     this._emitChange()
   }
 }

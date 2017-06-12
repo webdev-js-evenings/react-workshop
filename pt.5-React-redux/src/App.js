@@ -3,11 +3,11 @@ import './App.css';
 
 import InvoiceTable from './components/invoice-table'
 import TaxesCalculator from './components/taxes-calculator'
+import { connect } from './store'
 
 
 class App extends Component {
   render() {
-
     return (
       <div className='App row'>
         <div className='flex-4'>
@@ -19,8 +19,8 @@ class App extends Component {
           <TaxesCalculator {...this.props.tax} />
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default connect({}, {})(App);

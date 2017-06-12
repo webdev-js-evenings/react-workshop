@@ -1,10 +1,35 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
-import { initialData } from './store'
+import createStore, { initialData } from './store'
+import reducer from './store/reducer'
 
-ReactDOM.render(<App {...initialData} />, document.getElementById('root'));
-registerServiceWorker();
+
+const store = createStore(initialData, reducer)
+
+class StoreProvider extends React.PureComponent {
+  static childContextTypes = {
+    store: React.PropTypes.object.isRequired,
+  }
+
+  getChildContext() {
+    return {
+      store: this.props.store
+    }
+  }
+
+  render() {
+    return this.props.children
+  }
+}
+
+
+
+window.store = store
+ReactDOM.render(
+  <StoreProvider store={store}><App /></StoreProvider>,
+  document.getElementById('root')
+)
+

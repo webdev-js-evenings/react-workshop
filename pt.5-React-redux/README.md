@@ -95,7 +95,7 @@ Další prvek vylepšení funkcí by mohlo být oddělení toho, jak se vytvář
 --WebSocket-->  C     Naše apka     C  <-----history.push()---
                 E                   E
                 |                   |
-                ---------AKCE--------
+                ---------AKCE---------
 ```
 To sem hezky nakreslil!
 
@@ -158,11 +158,12 @@ class extends React.Component {
 
 class DiteHlavniKomponenty extends React.Component {
   static contextTypes = {
-    api: React.PropTypest.object.isRequired, // řekneme si o api v context, něco jako v /* @injext */ v Nette
+    api: React.PropTypest.object.isRequired,
+    // řekneme si o api v context, něco jako v /* @inject */ v Nette
   }
 
   render() {
-    const api = this.conext.api // Juhů takle je API dostupné a nic není potřeba předávat přes props.
+    const api = this.context.api // Juhů takle je API dostupné a nic není potřeba předávat přes props.
 
     return (..)
   }

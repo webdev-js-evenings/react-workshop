@@ -2,6 +2,10 @@ import React from 'react'
 
 import InvoiceForm from './invoice-form'
 
+import { connect } from '../store'
+
+import * as actions from '../actions'
+
 
 class InvoiceTable extends React.PureComponent {
   state = {
@@ -10,7 +14,12 @@ class InvoiceTable extends React.PureComponent {
 
 
   _handleAddInvoiceToggle = () => {
-    this.setState({ addInvoice: !this.state.addInvoice })
+    // this.setState({ addInvoice: !this.state.addInvoice })
+    if (Object.keys(this.props.nextInvoice).length === 0) {
+      this.props.openInvoiceModal(Date.now())
+    } else {
+      this.props.closeInvoiceModal()
+    }
   }
 
   render() {
@@ -28,19 +37,24 @@ class InvoiceTable extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>134TD</td>
-              <td>Avocode</td>
-              <td>132000</td>
-              <td>23123</td>
-              <td>123123213</td>
-            </tr>
+            {this.props.invoices.map(invoice => {
+              return (
+                <tr key={invoice.id}>
+                  <td>{invoice.id}</td>
+                  <td>{invoice.customer}</td>
+                  <td>{invoice.price}</td>
+                  <td>{invoice.VAT}</td>
+                  <td>{invoice.total}</td>
+                </tr>
+              )
+            })}
+
           </tbody>
         </table>
-        {this.state.addInvoice && <InvoiceForm invoice={{}} onHideRequest={this._handleAddInvoiceToggle} />}
+        <InvoiceForm invoice={{}} onHideRequest={this._handleAddInvoiceToggle} />
       </div>
     )
   }
 }
 
-export default InvoiceTable
+export default connect({}, actions)(InvoiceTable)

@@ -4,17 +4,22 @@ import Modal from './modal'
 
 import { connect } from '../store'
 
+import * as actions from '../actions'
 
-export default connect({})((props) => {
+
+export default connect({}, actions)((props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.onInvoiceAddRequest()
+    props.addInvoice()
   }
 
   const onInvoicePropertyChange = (property) => (e) => {
     props.onInvoicePropertyChange(property, e.target.value)
-    props.onHideRequest()
+  }
+
+  if (Object.keys(props.nextInvoice).length === 0) {
+    return null
   }
 
   return (
@@ -38,7 +43,7 @@ export default connect({})((props) => {
         </div>
         <div className='form-group'>
           <label htmlFor='total'>Celkem:</label>
-          <input className='form-control' readonly defaultValue={props.invoice.total} onChange={onInvoicePropertyChange('total')}/>
+          <input className='form-control' readOnly defaultValue={props.invoice.total} onChange={onInvoicePropertyChange('total')}/>
         </div>
         <div className='form-buttons'>
           <button className='btn'>Přidat fakturu</button>
