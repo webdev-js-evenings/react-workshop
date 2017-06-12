@@ -27,7 +27,23 @@ export const initialData = {
 }
 
 
-const createStore = (initialState, initialReducers, initialMiddlewares = [], services = {}) => {
+export const applyMiddleWare = (middlewares) => (createStore) => {
+  return (...args) => {
+    const store = createStore(...args)
+
+    const dispatch = middlewares.reduce((originalDispatch, middleware) => {
+      return middleware(store)(originalDispatch)
+    }, store.dispatch)
+
+    return {
+      ...store,
+      dispatch,
+    }
+  }
+}
+
+
+export default  (initialState, initialReducers, initialMiddlewares = [], services = {}) => {
   let listeners = []
   let state = initialState
   const reducers = initialReducers
@@ -65,20 +81,12 @@ const createStore = (initialState, initialReducers, initialMiddlewares = [], ser
     return state
   }
 
-  const createDispatchWithMiddleware = (middleWares) => {
-    return middleWares.reduce((originalDispatch, middleware) => {
-      return middleware(originalDispatch)
-    }, dispatch)
-  }
 
   return {
     listen,
     unlisten,
-    dispatch: createDispatchWithMiddleware(initialMiddlewares),
+    dispatch,
     getState,
     getServices,
   }
 }
-
-
-export default createStore

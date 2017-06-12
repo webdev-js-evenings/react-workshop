@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-import createStore, { initialData } from './store'
+import createStore, { applyMiddleWare, initialData } from './store'
+import loggerMiddleware from './store/logger-middleware'
 import reducer from './store/reducer'
 import firebase from "firebase"
 
