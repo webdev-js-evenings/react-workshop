@@ -1,4 +1,5 @@
-import React from 'react'
+import connectReact from './connect'
+export const connect = connectReact
 
 
 export const initialData = {
@@ -26,63 +27,10 @@ export const initialData = {
 }
 
 
-export const connect = (stateToProps = {}, actions = {}) => (Component) => {
-  return class extends React.PureComponent {
-    static contextTypes = {
-      store: React.PropTypes.object.isRequired,
-    }
-
-    static displayName = Component.displayName || Component.name
-
-    state = this.context.store.getState()
-
-    componentDidMount() {
-      this.context.store.listen(this._handleStoreChange)
-    }
-
-    componentWillUnmout() {
-      this.context.store.unlisten(this._handleStoreChange)
-    }
-
-    _handleStoreChange = () => {
-      this.setState( this.context.store.getState())
-    }
-
-    _prepareActions() {
-      const actionKeys = Object.keys(actions)
-      return actionKeys.reduce((wrappedActions, actionKey) => {
-        wrappedActions[actionKey] = (...args) => {
-          this.context.store.dispatch(actions[actionKey](...args))
-        }
-
-        return wrappedActions
-      }, {})
-    }
-
-    render() {
-      const stateKeys = Object.keys(stateToProps)
-      const state = stateKeys.reduce((state, stateKey) => {
-        return {
-          ...state,
-          [stateToProps[stateKey]]: this.state[stateKey], // transform to keys from stateProps = {'stateKey': 'propsKey'}
-        }
-      }, stateKeys.length === 0 ? this.state : {})
-
-      const props = {
-        ...state,
-        ...this.props,
-        ...this._prepareActions(),
-      }
-
-      return <Component {...props} />
-    }
-  }
-}
-
-const createStore = (initialState, initialReducers) => {
+const createStore = (initialState, initialReducers, initialMiddlewares = [], services = {}) => {
   let listeners = []
   let state = initialState
-  let reducers = initialReducers
+  const reducers = initialReducers
 
   const listen = (listener) => {
     listeners.push(listener)
@@ -90,6 +38,10 @@ const createStore = (initialState, initialReducers) => {
 
   const unlisten = (listener) => {
     listeners = listeners.filter(candidate => candidate !== listener)
+  }
+
+  const getServices = () => {
+    return services
   }
 
   const getState = (keys = []) => {
@@ -101,22 +53,30 @@ const createStore = (initialState, initialReducers) => {
   }
 
   const dispatch = (action) => {
-    const nextState = reducers.reduce((reducedState, reducer) => { return reducer(reducedState, action) }, state)
+    const nextState = reducers.reduce((reducedState, reducer) => {
+      return reducer(reducedState, action)
+    }, state)
     if (nextState === state) {
-      console.info('Nothing changed.')
       return
     }
 
     state = nextState
-    console.info('Action dispatched:', action.action, action.payload, state)
     listeners.forEach(listener => listener())
+    return state
+  }
+
+  const createDispatchWithMiddleware = (middleWares) => {
+    return middleWares.reduce((originalDispatch, middleware) => {
+      return middleware(originalDispatch)
+    }, dispatch)
   }
 
   return {
     listen,
     unlisten,
-    dispatch,
+    dispatch: createDispatchWithMiddleware(initialMiddlewares),
     getState,
+    getServices,
   }
 }
 

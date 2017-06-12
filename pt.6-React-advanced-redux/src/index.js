@@ -5,11 +5,29 @@ import './index.css';
 
 import createStore, { initialData } from './store'
 import reducer from './store/reducer'
+import firebase from "firebase"
 
 //import './store/mini-redux'
 
 
-const store = createStore(initialData, [reducer])
+const config = {
+  apiKey: "AIzaSyA5jKFg6VsSLkfKeeTz1ZrFfI3z6NML__0",
+  authDomain: "state-container.firebaseapp.com",
+  databaseURL: "https://state-container.firebaseio.com",
+  projectId: "state-container",
+  storageBucket: "state-container.appspot.com",
+  messagingSenderId: "728941706922"
+};
+
+
+
+const client = firebase.initializeApp(config)
+client.auth().signInAnonymously()
+
+const store = createStore(initialData, [reducer], [], {
+  firebase: client,
+  database: client.database()
+})
 
 class StoreProvider extends React.PureComponent {
   static childContextTypes = {

@@ -17,6 +17,11 @@ export default connect({
     props.addInvoice()
   }
 
+  const handleHideRequest = (e) => {
+    e.preventDefault()
+    props.onHideRequest()
+  }
+
   const onInvoicePropertyChange = (property) => (e) => {
     props.onInvoicePropertyChange(property, e.target.value)
   }
@@ -54,7 +59,7 @@ export default connect({
         </div>
         <div className='form-buttons'>
           <button className='btn'>Přidat fakturu</button>
-          <button className='btn btn-danger' onClick={props.onHideRequest}>Zrušit</button>
+          <button className='btn btn-danger' onClick={handleHideRequest}>Zrušit</button>
         </div>
       </form>
     </Modal>

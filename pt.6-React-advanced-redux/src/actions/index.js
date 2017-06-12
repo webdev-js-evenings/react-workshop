@@ -1,11 +1,18 @@
-export const openInvoiceModal = (invoiceId) => {
+
+const inject = (services) => (fn) => {
+  fn.services = ['database']
+  return fn
+}
+
+export const openInvoiceModal = inject(['database'])((invoiceId, { database }) => {
   return {
     action: 'INVOICE_MODAL_OPEN',
     payload: {
       id: invoiceId,
     }
   }
-}
+})
+
 
 export const closeInvoiceModal = () => {
   return {
