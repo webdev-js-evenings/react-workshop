@@ -43,7 +43,7 @@ export const applyMiddleWare = (middlewares) => (createStore) => {
 }
 
 
-export default  (initialState, initialReducers, initialMiddlewares = [], services = {}) => {
+export default  (initialState, initialReducers, services = {}) => {
   let listeners = []
   let state = initialState
   const reducers = initialReducers
@@ -79,6 +79,12 @@ export default  (initialState, initialReducers, initialMiddlewares = [], service
     state = nextState
     listeners.forEach(listener => listener())
     return state
+  }
+
+  services = {
+    ...services,
+    getState,
+    dispatch,
   }
 
 

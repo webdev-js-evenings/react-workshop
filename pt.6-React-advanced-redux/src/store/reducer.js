@@ -28,7 +28,7 @@ export default (state, { action, payload }) => {
       return {
         ...state,
         nextInvoice: {},
-        invoices: state.invoices.concat([state.nextInvoice])
+        invoices: state.invoices.concat([payload.invoice])
       }
   }
 

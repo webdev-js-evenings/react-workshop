@@ -194,7 +194,7 @@ export default const fetchInvoice = (invoiceId, customFetch) => {
   return customFetch('invoices/' + invoiceId)
 }
 ```
-Výborně, custom api si už hezky předáváme a teď jak to otetujeme?
+Výborně, custom api si už hezky předáváme a teď jak to otestujeme?
 ```js
 const mockResponse = {
   'id': 123,
@@ -211,9 +211,9 @@ fetchInvoice(123, customFetchMock).then((result) => {
   }
 })
 ```
-Tadá! Testovatelný kód WTF. Stačí pouze psát takový kód, který **vrací** výsledky a všechny proměnné, které potřebuje pro svůj chod vždy dostává přes parametry (klidně i v closure).
+Tadá! Testovatelný kód FTW! Stačí pouze psát takový kód, který **vrací** výsledky a všechny proměnné, které potřebuje pro svůj chod vždy dostává přes parametry (klidně i v closure).
 
-#$# DI Container
+### DI Container
 Samozřejmě je otravný všechny pořád někam předávat a tak by asi nebylo od věci, kdybychom si nějak chytře všechny služby předávali.
 
 V našem příkladu budeme používat `firebase`, což je externí služby tj. typický kandidát pro předávání jako závislost.
@@ -289,7 +289,130 @@ _prepareActions() {
   }, {})
 }
 ```
-Takže jsme si vytvořili metodu `_createAtion()`, která zase jenom obalí původní action creator (funkce vracející akci) a podle klíčů, které může action creator mít v property `services` (funkce v Javascriptu je také objekt), ji předáme jako poslední argument požadovaný objekty se závislostmi.
+Takže jsme si vytvořili metodu `_createAction()`, která zase jenom obalí původní action creator (funkce vracející akci) a podle klíčů, které může action creator mít v property `services` (funkce v Javascriptu je také objekt), ji předáme jako poslední argument požadovaný objekty se závislostmi.
 
 No není to ale elegantní? Samozřejmě by to šlo vyřešit i jinou cestou, ale tohle je myslím dostatečné, zatím...
 
+## API
+Takže máme všechno připraveno pro to, abychom si aplikačku připojili k nějakému APIčku.
+
+Já jsem už připravil Firebasku, kam budeme ukládat fakturky a začneme zlehka. Nejdřív si upravíme seznam faktur tak, aby přijímal faktury z api a při jejich načítání zobrazil nějakou načítácí komponentu. Na to se samozřejmě bude hodit nějaká chytrá komponentička, která obstará request. Sic je pravda, že by fetchování dat **nemělo** být v komponentách, ale zatím si to zjednodušíme a prostě pokud se daná komponenta namountuje, tak udělá request, jakmile se request vykoná, tak vykreslí své děti, takovéto api:
+```js
+const renderAsync = ({ url }) => {
+  return (
+    <LazyLoad url={url} loadingComponent={<Loading />} errorComponent={<Error />}>
+      {(apiInvoices) => (
+        <InvoiceTable invoices={apiInvoices}>
+      )}
+    </LazyLoad>
+  )
+}
+```
+To by bylo docela cool, ne? Jdeme na to! My tedy budeme používat firebase, proto si komponentu můžeme uzpůsobit tak, aby dělala vždy requesty do firebasky.
+
+Takže jsem takovou komponentičku urobil [tuhle](./src/components/lazy-load.js). Mrkněte se na ni, je fakt jednoduchoučká.
+
+Zajímavější ale bude spíš sledovat, jak se budou aktualizovat fakturky, že? Tak umíme jednoduše fakturu přidat, teď by to chtělo ji ale ještě poslat do APIčka.
+
+Na tohle samozřejmě slouží pouze a jenom action creatory - známe přeci schéma fluxu. Takže prostě k přidání faktury ještě přidáme volání do API, která fakturu přidá.
+
+Skončíme s něčím takovým:
+```js
+export const addInvoice = inject(['database', 'getState'])(async (formInvoiceProps, { database, getState }) => {
+  const nextInvoice = getState().nextInvoice
+  if (Object.keys(nextInvoice) === 0) {
+    return
+  }
+
+  const invoice = {
+    ...nextInvoice,
+    ...formInvoiceProps,
+  }
+
+
+  await database.ref(`/invoices/${nextInvoice.id}`).set(invoice)
+
+  return {
+    action: 'ADD_NEXT_INVOICE',
+    payload: { invoice },
+  }
+})
+```
+
+Huh, komplikované? To jo. Ještě ke všemu budeme potřebovat nějaký hezký middleware. Protože takový action creator už dávno nevrací pouhou akci. Jedná se o asynchronní funkci, která vrací vždy promise a až jako argument metody `then()` přichází výsledek action creator.
+
+Zajímavé ale je to, že do API posíláme to samé, co si ukládáme lokálně, můžeme tedy klidně `await a async` smazat a v klidu si nechat teď už nečistou funkci, která ovšem nebude čekat na výsledek zapisání do firebasky, tedy všechno se zapíše okamžitě.
+
+No, zatím to tak ale necháme.
+
+Je to jiný problém.
+
+## Routing není jen tak...
+Máme komponentu InvoiceTable, která má sobě načítání pole faktur, které získává přes LazyLoad komponentu. To je supr, pokud se tahle komponenta má vykreslit jednou při startu aplikace, ale jak pak donutit LazyLoad aby refreshnul seznam faktur, pokud jsme ho změnili? Jasný, je to firebase, takže by šlo prostě poslouchat na změny, ale to my nechceme.
+
+Chceme mít přece pravdu uloženou ve stavu a nikde jinde. To, že v APIčku jsou data uložená jinak nás moc netrápí. Nějaká API odpověď by pro nás přece měla být akce, ne? Stav aplikace se dá pouze měnit akcemi.
+
+Takže jak teda tenhle problém vyřešit? Je samozřejmě jasné, určitě chceme refreshnout data jakmile si zobrazíme nějakou url, to je jasný. Tj. chceme refreshnout seznam faktur pokud:
+- přijdeme na url
+- změní se url
+- lokálně změníme seznam faktur
+- asi trilion dalších...
+
+Huh, co s tím. No, bohužel žijeme tak trochu v době kamenné, neboť prostě, když víme, že měníme stav nějakého seznamu, tak musíme otrocky zavolat nějakou refresh funkci, která faktury refreshne. Prostě se s tím nedá nic dělat :(...
+
+Ovšem, situace je docela fajn, pokud máme to štěstí a používáme firebase. Ta totiž funguje přes websockety a tak je jednoduché prostě jenom poslouchat na změny ve firebase a dispatchovat tuhle akci.
+
+Ke změně stavu potřebujeme pouze referenci na funkci `dispatch()` nic víc není potřeba. Takže pokud máme funkci `dispatch()` nic nám nebrání v:
+```js
+database.ref('/invoices').on('value', snapshot => dispatch({
+  type: 'REFRESH_INVOICE',
+  payload: { invoices: toArray(snapshot) },
+})
+```
+A je to... Tohle zajistí kontinuální aktualizaci faktur, aniž bychom je museli při každé změně aktualizovat ručně.
+
+Tohle je ovšem hudba budoucnosti a tak budeme muset prostě pořád volat funkci `refreshInvoices()` :(...
+
+### Routing
+A jak je to se změnou routy? No tak jak jsme si říkali. Jediná věc, která může změnit stav aplikace je akce. Takže změna URL je prostě a jenom změny routy, nemyslíte?
+
+Máme-li `dispatch()` můžeme změnit i routy:
+```js
+window.addEventListener('popstate', () => {
+  dispatch({
+    type: 'CHANGE_ROUTE',
+    payload: { route: window.location.href + window.location.search },
+  })
+})
+```
+Tadá!
+
+Přidat refreshování přes APIčko pak není problém, ne? Vyzkoušíme!
+
+No a když máme tohle, tak co matchování rout? To je přece také snadňoučké!
+```js
+const routes = {
+  '/ahoj': (uri) => {
+    console.log('ahoj uri', uri)
+  }
+}
+
+const match = (routes, uri) => {
+  const parsedUri = parse(uri, true)
+  const { pathname } = parsedUri
+  if (routes[pathname]) {
+    return routes[pathname](parsedUri)
+  }
+
+  return null
+}
+```
+Funkce `match()` bere objekt route a ty pak matchuje s url, která je jí poslaná. Pokud route odpovídá, tak se nastaví.
+
+Takto je primitivní udělat například stránku 404 nebo případně si zavolat action creator, který by třeba refreshnul invoicy. Máte pocit, že je to složité? Já ne.
+
+Routu je samozřejmě žádoucí předávat do stavu a pak si můžete udělat komponetu `<Route path='/my-path/'/>`, která by prostě zobrazovala svoje děti v závislosti na tom, jestli klíč `route` ve stavu odpovídá tomu, které jste jí předali v property `path`. No není to krásné? To si taky napíšeme!
+
+Nejhezčí příklad by bylo, kdybychom pomocí routy dokázali zobrazit modal k úpravě invoicy. Modal je jednoduchá komponenta, která prostě a jenom bere jako argument invoice, pokud je nastavená, nebude tedy problém ho upravit, aby si mohl tahat ID invoicy z URL a pak se prostě zobrazil, to by byla krása...
+
+Trošku samozřejmě bude problém to, že se bude muset na faktury "pokčat", ale to se dá nastavit jedním flagem ve storu, ne? Paráda!

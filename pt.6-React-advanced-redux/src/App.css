@@ -11,6 +11,16 @@ body {
   height: 80px;
 }
 
+.cell-right {
+  text-align: right;
+  padding-right: 5px;
+}
+
+.total {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
 .App-header {
   background-color: #222;
   height: 150px;

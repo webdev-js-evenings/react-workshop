@@ -12,9 +12,14 @@ export default connect({
   'vatRatio': 'VAT',
 }, actions)((props) => {
 
+
+  const price = Number(props.invoice.price) || 0
+  const vat = Math.round(price / 100 * Number(props.VAT))
+  const total = price + vat
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.addInvoice()
+    props.addInvoice({ price, vat, total })
   }
 
   const handleHideRequest = (e) => {
@@ -29,11 +34,6 @@ export default connect({
   if (Object.keys(props.invoice).length === 0) {
     return null
   }
-
-  const price = Number(props.invoice.price) || 0
-  const vat = Math.round(price / 100 * Number(props.VAT))
-  const total = price + vat
-
   return (
     <Modal {...props} title='Přidat fakturu'>
       <form onSubmit={handleSubmit}>
